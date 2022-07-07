@@ -133,8 +133,4 @@ public interface IBaritone {
      */
     ICommandManager getCommandManager();
 
-    /**
-     * Open click
-     */
-    void openClick();
 }

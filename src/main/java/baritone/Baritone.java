@@ -21,20 +21,20 @@ import baritone.api.BaritoneAPI;
 import baritone.api.IBaritone;
 import baritone.api.Settings;
 import baritone.api.event.listener.IEventBus;
-import baritone.api.utils.Helper;
 import baritone.api.utils.IPlayerContext;
-import baritone.behavior.*;
+import baritone.behavior.Behavior;
+import baritone.behavior.InventoryBehavior;
+import baritone.behavior.LookBehavior;
+import baritone.behavior.PathingBehavior;
 import baritone.cache.WorldProvider;
 import baritone.command.manager.CommandManager;
 import baritone.event.GameEventHandler;
 import baritone.process.*;
 import baritone.selection.SelectionManager;
 import baritone.utils.BlockStateInterface;
-import baritone.utils.GuiClick;
 import baritone.utils.InputOverrideHandler;
 import baritone.utils.PathingControlManager;
 import baritone.utils.player.PrimaryPlayerContext;
-import net.minecraft.client.Minecraft;
 
 import java.io.File;
 import java.io.IOException;
@@ -56,7 +56,7 @@ public class Baritone implements IBaritone {
     static {
         threadPool = new ThreadPoolExecutor(4, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<>());
 
-        dir = new File(Minecraft.getMinecraft().gameDir, "baritone");
+        dir = new File(Minecraft.getInstance().gameDirectory, "baritone");
         if (!Files.exists(dir.toPath())) {
             try {
                 Files.createDirectories(dir.toPath());
@@ -69,7 +69,6 @@ public class Baritone implements IBaritone {
     private PathingBehavior pathingBehavior;
     private LookBehavior lookBehavior;
     private InventoryBehavior inventoryBehavior;
-    private WaypointBehavior waypointBehavior;
     private InputOverrideHandler inputOverrideHandler;
 
     private FollowProcess followProcess;
@@ -102,7 +101,6 @@ public class Baritone implements IBaritone {
             lookBehavior = new LookBehavior(this);
             inventoryBehavior = new InventoryBehavior(this);
             inputOverrideHandler = new InputOverrideHandler(this);
-            waypointBehavior = new WaypointBehavior(this);
         }
 
         this.pathingControlManager = new PathingControlManager(this);
@@ -208,15 +206,6 @@ public class Baritone implements IBaritone {
         return this.commandManager;
     }
 
-    @Override
-    public void openClick() {
-        new Thread(() -> {
-            try {
-                Thread.sleep(100);
-                Helper.mc.addScheduledTask(() -> Helper.mc.displayGuiScreen(new GuiClick()));
-            } catch (Exception ignored) {}
-        }).start();
-    }
 
     public static Settings settings() {
         return BaritoneAPI.getSettings();

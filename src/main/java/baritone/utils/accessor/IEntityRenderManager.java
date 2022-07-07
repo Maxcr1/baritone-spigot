@@ -15,21 +15,13 @@
  * along with Baritone.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package baritone.launch.mixins;
+package baritone.utils.accessor;
 
-import baritone.utils.accessor.IItemTool;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemTool;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
+public interface IEntityRenderManager {
 
-@Mixin(ItemTool.class)
-public class MixinItemTool implements IItemTool {
-    @Shadow protected Item.ToolMaterial toolMaterial;
+    double renderPosX();
 
-    @Override
-    public int getHarvestLevel() {
-        return toolMaterial.getHarvestLevel();
-    }
+    double renderPosY();
 
+    double renderPosZ();
 }

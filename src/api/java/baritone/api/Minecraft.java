@@ -15,18 +15,17 @@
  * along with Baritone.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package baritone.utils.accessor;
+package baritone.api;
 
-import baritone.cache.WorldProvider;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.player.Player;
 
-import java.io.File;
+public class Minecraft {
 
-/**
- * @author Brady
- * @see WorldProvider
- * @since 8/4/2018
- */
-public interface IAnvilChunkLoader {
+    public ServerLevel level;
+    public Player player;
 
-    File getChunkSaveLocation();
+    public static Minecraft getInstance(){
+        return new Minecraft();
+    }
 }

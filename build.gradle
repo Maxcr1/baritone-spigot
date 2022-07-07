@@ -15,155 +15,99 @@
  * along with Baritone.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-group 'baritone'
-version '1.2.15'
-
-buildscript {
-    repositories {
-        maven {
-            name = 'forge'
-            url = 'http://files.minecraftforge.net/maven'
-        }
-        maven {
-            name = 'SpongePowered'
-            url = 'https://repo.spongepowered.org/repository/maven-public/'
-        }
-        jcenter()
-    }
-
-    dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
-        classpath 'org.spongepowered:mixingradle:0.6-SNAPSHOT'
-    }
+plugins {
+    id 'java'
+    id 'maven-publish'
 }
 
+group 'baritone'
+version '1.8.3'
 
-import baritone.gradle.task.CreateDistTask
-import baritone.gradle.task.ProguardTask
-
-apply plugin: 'java'
-apply plugin: 'maven'
-apply plugin: 'net.minecraftforge.gradle.tweaker-client'
-apply plugin: 'org.spongepowered.mixin'
-
-sourceCompatibility = targetCompatibility = '1.8'
+sourceCompatibility = targetCompatibility = JavaVersion.VERSION_17
 compileJava {
-    sourceCompatibility = targetCompatibility = '1.8'
     options.encoding = "UTF-8" // allow emoji in comments :^)
 }
 
+repositories {
+    jcenter()
+    mavenLocal()
+}
+
 sourceSets {
+    api {
+        compileClasspath += main.compileClasspath
+    }
+    main {
+        compileClasspath += api.output
+    }
+    test {
+        compileClasspath += main.compileClasspath + main.runtimeClasspath + main.output
+        runtimeClasspath += main.compileClasspath + main.runtimeClasspath + main.output
+    }
     launch {
         compileClasspath += main.compileClasspath + main.runtimeClasspath + main.output
+        runtimeClasspath += main.compileClasspath + main.runtimeClasspath + main.output
     }
-
     schematica_api {
         compileClasspath += main.compileClasspath
     }
-
     main {
         compileClasspath += schematica_api.output
     }
 }
 
-minecraft {
-    version = '1.12.2'
-    mappings = 'stable_39'
-    tweakClass = 'baritone.launch.BaritoneTweaker'
-    runDir = 'run'
-
-    // The sources jar should use SRG names not MCP to ensure compatibility with all mappings
-    makeObfSourceJar = true
-}
-
 repositories {
-    mavenCentral()
 
     maven {
-        name = 'spongepowered-repo'
-        url = 'https://repo.spongepowered.org/repository/maven-public/'
+        url = "https://hub.spigotmc.org/nexus/content/repositories/snapshots"
     }
 
-    maven {
-        name = 'impactdevelopment-repo'
-        url = 'https://impactdevelopment.github.io/maven/'
-    }
+    maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
+    maven { url = 'https://oss.sonatype.org/content/repositories/central' }
+    mavenLocal()
 }
 
 dependencies {
-    runtime launchCompile('com.github.ImpactDevelopment:SimpleTweaker:1.2')
-    runtime launchCompile('org.spongepowered:mixin:0.7.11-SNAPSHOT') {
-        // Mixin includes a lot of dependencies that are too up-to-date
-        exclude module: 'launchwrapper'
-        exclude module: 'guava'
-        exclude module: 'gson'
-        exclude module: 'commons-io'
-        exclude module: 'log4j-core'
-    }
     testImplementation 'junit:junit:4.12'
+    compileOnly 'org.spigotmc:spigot-api:1.19-R0.1-SNAPSHOT' // The Spigot API with no shadowing. Requires the OSS repo.
+    compileOnly 'org.spigotmc:spigot:1.19-R0.1-SNAPSHOT:remapped-mojang' // The full Spigot server with no shadowing. Requires mavenLocal.
+    compileOnly 'org.jetbrains:annotations:16.0.2'
 }
+//
+//javadoc {
+//    options.addStringOption('Xwerror', '-quiet') // makes the build fail on travis when there is a javadoc error
+//    options.linkSource true
+//    options.encoding "UTF-8" // allow emoji in comments :^)
+//}
+//
+//
+//task proguard(type: ProguardTask) {
+//    url 'https://downloads.sourceforge.net/project/proguard/proguard/6.0/proguard6.0.3.zip'
+//    extract 'proguard6.0.3/lib/proguard.jar'
+//}
+//
+//task createDist(type: CreateDistTask, dependsOn: proguard)
+//
+//build.finalizedBy(createDist)
 
-mixin {
-    defaultObfuscationEnv searge
-    add sourceSets.launch, 'mixins.baritone.refmap.json'
-}
-
-javadoc {
-    options.addStringOption('Xwerror', '-quiet') // makes the build fail on travis when there is a javadoc error
-    options.linkSource true
-    options.encoding "UTF-8" // allow emoji in comments :^)
-    source = sourceSets.api.allJava
-    classpath += sourceSets.api.compileClasspath
-}
-
-jar {
-    from sourceSets.launch.output, sourceSets.api.output
-
-    if (!getProject().hasProperty("baritone.forge_build")) {
-        exclude "**/BaritoneForgeModXD.class"
-        exclude "**/mods.toml"
-    }
-
-    preserveFileTimestamps = false
-    reproducibleFileOrder = true
-
-    manifest {
-        attributes(
-                'MixinConfigs': 'mixins.baritone.json',
-
-                'Implementation-Title': 'Baritone',
-                'Implementation-Version': version
-        )
-    }
-}
-
-task proguard(type: ProguardTask) {
-    url 'https://downloads.sourceforge.net/project/proguard/proguard/6.0/proguard6.0.3.zip'
-    extract 'proguard6.0.3/lib/proguard.jar'
-}
-
-task createDist(type: CreateDistTask, dependsOn: proguard)
-
-build.finalizedBy(createDist)
-
-install {
-    def jarApiName = String.format("%s-api-%s", rootProject.name, version.toString())
-    def jarApiForgeName = String.format("%s-api-forge-%s", rootProject.name, version.toString())
-    def jarSAName = String.format("%s-standalone-%s", rootProject.name, version.toString())
-    def jarSAForgeName = String.format("%s-standalone-forge-%s", rootProject.name, version.toString())
-
-    artifacts {
-        archives file("$buildDir/libs/"+jarApiName+".jar")
-        archives file("$buildDir/libs/"+jarApiForgeName+".jar")
-        archives file("$buildDir/libs/"+jarSAName+".jar")
-        archives file("$buildDir/libs/"+jarSAForgeName+".jar")
-    }
-    repositories.mavenInstaller {
-		addFilter('api') { artifact, file -> artifact.name == "baritone-api" }
-		addFilter('api-forge') { artifact, file -> artifact.name == "baritone-api-forge" }
-		addFilter('standalone') { artifact, file -> artifact.name == "baritone-standalone" }
-		addFilter('standalone-forge') { artifact, file -> artifact.name == "baritone-standalone-forge" }
-    }
-}
-
-install.dependsOn(build)
+//install {
+//    def jarApiName = String.format("%s-api-%s", rootProject.name, version.toString())
+//    def jarApiForgeName = String.format("%s-api-forge-%s", rootProject.name, version.toString())
+//    def jarSAName = String.format("%s-standalone-%s", rootProject.name, version.toString())
+//    def jarSAForgeName = String.format("%s-standalone-forge-%s", rootProject.name, version.toString())
+//
+//    artifacts {
+//        archives file("$buildDir/libs/"+jarApiName+".jar")
+//        archives file("$buildDir/libs/"+jarApiForgeName+".jar")
+//        archives file("$buildDir/libs/"+jarSAName+".jar")
+//        archives file("$buildDir/libs/"+jarSAForgeName+".jar")
+//    }
+//    repositories.mavenInstaller {
+//		addFilter('api') { artifact, file -> artifact.name == "baritone-api" }
+//		addFilter('api-forge') { artifact, file -> artifact.name == "baritone-api-forge" }
+//		addFilter('standalone') { artifact, file -> artifact.name == "baritone-standalone" }
+//		addFilter('standalone-forge') { artifact, file -> artifact.name == "baritone-standalone-forge" }
+//    }
+//}
+//
+//install.dependsOn(build)

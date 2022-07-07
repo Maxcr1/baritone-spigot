@@ -15,19 +15,12 @@
  * along with Baritone.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package baritone.launch.mixins;
+package baritone.utils.accessor;
 
-import baritone.utils.accessor.IGuiScreen;
-import net.minecraft.client.gui.GuiScreen;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.gen.Invoker;
+import net.minecraft.client.multiplayer.ClientChunkCache;
 
-import java.net.URI;
+public interface IClientChunkProvider {
+    ClientChunkCache createThreadSafeCopy();
 
-@Mixin(GuiScreen.class)
-public abstract class MixinGuiScreen implements IGuiScreen {
-
-    @Override
-    @Invoker("openWebLink")
-    public abstract void openLink(URI url);
+    IChunkArray extractReferenceArray();
 }

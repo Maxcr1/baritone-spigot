@@ -30,8 +30,6 @@ public final class DefaultCommands {
     public static List<ICommand> createAll(IBaritone baritone) {
         Objects.requireNonNull(baritone);
         List<ICommand> commands = new ArrayList<>(Arrays.asList(
-                new HelpCommand(baritone),
-                new SetCommand(baritone),
                 new CommandAlias(baritone, Arrays.asList("modified", "mod", "baritone", "modifiedsettings"), "List modified settings", "set modified"),
                 new CommandAlias(baritone, "reset", "Reset all settings or just one", "set reset"),
                 new GoalCommand(baritone),
@@ -60,12 +58,9 @@ public final class DefaultCommands {
                 new FindCommand(baritone),
                 new MineCommand(baritone),
                 new ClickCommand(baritone),
-                new SurfaceCommand(baritone),
                 new ThisWayCommand(baritone),
-                new WaypointsCommand(baritone),
                 new CommandAlias(baritone, "sethome", "Sets your home waypoint", "waypoints save home"),
-                new CommandAlias(baritone, "home", "Path to your home waypoint", "waypoints goto home"),
-                new SelCommand(baritone)
+                new CommandAlias(baritone, "home", "Path to your home waypoint", "waypoints goto home")
         ));
         ExecutionControlCommands prc = new ExecutionControlCommands(baritone);
         commands.add(prc.pauseCommand);

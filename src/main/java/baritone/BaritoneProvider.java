@@ -24,7 +24,6 @@ import baritone.api.command.ICommandSystem;
 import baritone.api.schematic.ISchematicSystem;
 import baritone.cache.WorldScanner;
 import baritone.command.CommandSystem;
-import baritone.command.ExampleBaritoneControl;
 import baritone.utils.schematic.SchematicSystem;
 
 import java.util.Collections;
@@ -42,9 +41,6 @@ public final class BaritoneProvider implements IBaritoneProvider {
     {
         this.primary = new Baritone();
         this.all = Collections.singletonList(this.primary);
-
-        // Setup chat control, just for the primary instance
-        new ExampleBaritoneControl(this.primary);
     }
 
     @Override
