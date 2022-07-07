@@ -668,12 +668,6 @@ public final class Settings {
      */
     public final Setting<Boolean> antiCheatCompatibility = new Setting<>(true);
 
-    /**
-     * Exclusively use cached chunks for pathing
-     * <p>
-     * Never turn this on
-     */
-    public final Setting<Boolean> pathThroughCachedOnly = new Setting<>(false);
 
     /**
      * Continue sprinting while in water

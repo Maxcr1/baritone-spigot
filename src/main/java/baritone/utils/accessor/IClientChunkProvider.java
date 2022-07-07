@@ -17,10 +17,10 @@
 
 package baritone.utils.accessor;
 
-import net.minecraft.client.multiplayer.ClientChunkCache;
+import net.minecraft.server.level.ServerChunkCache;
 
 public interface IClientChunkProvider {
-    ClientChunkCache createThreadSafeCopy();
+    ServerChunkCache createThreadSafeCopy();
 
     IChunkArray extractReferenceArray();
 }

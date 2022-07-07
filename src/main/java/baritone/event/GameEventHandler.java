@@ -104,11 +104,6 @@ public final class GameEventHandler implements IEventBus, Helper {
     }
 
     @Override
-    public final void onRenderPass(RenderEvent event) {
-        listeners.forEach(l -> l.onRenderPass(event));
-    }
-
-    @Override
     public final void onWorldEvent(WorldEvent event) {
         WorldProvider cache = baritone.getWorldProvider();
 

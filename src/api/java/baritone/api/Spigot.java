@@ -18,14 +18,16 @@
 package baritone.api;
 
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.server.level.ServerPlayer;
+import org.bukkit.plugin.Plugin;
 
-public class Minecraft {
+public class Spigot {
 
     public ServerLevel level;
-    public Player player;
+    public ServerPlayer player;
+    public Plugin plugin;
 
-    public static Minecraft getInstance(){
-        return new Minecraft();
+    public static Spigot getInstance(){
+        return new Spigot();
     }
 }

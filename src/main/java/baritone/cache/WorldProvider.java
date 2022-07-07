@@ -20,7 +20,6 @@ package baritone.cache;
 import baritone.Baritone;
 import baritone.api.cache.IWorldProvider;
 import baritone.api.utils.Helper;
-import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.dimension.DimensionType;
@@ -59,39 +58,19 @@ public class WorldProvider implements IWorldProvider, Helper {
         Path directory;
         Path readme;
 
-        IntegratedServer integratedServer = mc.getSingleplayerServer();
+//        IntegratedServer integratedServer = mc.getSingleplayerServer();
 
-        // If there is an integrated server running (Aka Singleplayer) then do magic to find the world save file
-        if (mc.hasSingleplayerServer()) {
-            directory = DimensionType.getStorageFolder(worldKey, integratedServer.getWorldPath(LevelResource.ROOT));
+        // Baritone-Spigot Note: Since this runs on the server, the local world folder is always avaliable.
+        directory = DimensionType.getStorageFolder(worldKey, Path.of(HELPER.mc.plugin.getDataFolder().getParentFile().getParentFile().getPath() + "world"));
 
-            // Gets the "depth" of this directory relative the the game's run directory, 2 is the location of the world
-            if (directory.relativize(mc.gameDirectory.toPath()).getNameCount() != 2) {
-                // subdirectory of the main save directory for this world
-                directory = directory.getParent();
-            }
-
-            directory = directory.resolve("baritone");
-            readme = directory;
-        } else { // Otherwise, the server must be remote...
-            String folderName;
-            if (mc.isConnectedToRealms()) {
-                folderName = "realms";
-            } else {
-                if (mc.getCurrentServer() != null) {
-                    folderName = mc.getCurrentServer().ip;
-                } else {
-                    //replaymod causes null currentServerData and false singleplayer.
-                    currentWorld = null;
-                    return;
-                }
-            }
-            if (SystemUtils.IS_OS_WINDOWS) {
-                folderName = folderName.replace(":", "_");
-            }
-            directory = Baritone.getDir().toPath().resolve(folderName);
-            readme = Baritone.getDir().toPath();
+        // Gets the "depth" of this directory relative the the game's run directory, 2 is the location of the world
+        if (directory.relativize(mc.plugin.getDataFolder().toPath()).getNameCount() != 2) {
+            // subdirectory of the main save directory for this world
+            directory = directory.getParent();
         }
+
+        directory = directory.resolve("baritone");
+        readme = directory;
 
         // lol wtf is this baritone folder in my minecraft save?
         try (FileOutputStream out = new FileOutputStream(readme.resolve("readme.txt").toFile())) {

@@ -321,7 +321,7 @@ public final class MineProcess extends BaritoneProcessHelper implements IMinePro
             return Collections.emptyList();
         }
         List<BlockPos> ret = new ArrayList<>();
-        for (Entity entity : ((ServerLevel) ctx.world()).entitiesForRendering()) {
+        for (Entity entity : (ctx.world()).entityManager.getEntityGetter().getAll()) {
             if (entity instanceof ItemEntity) {
                 ItemEntity ei = (ItemEntity) entity;
                 if (filter.has(ei.getItem())) {

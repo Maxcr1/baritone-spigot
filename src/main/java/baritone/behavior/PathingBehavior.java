@@ -235,17 +235,18 @@ public final class PathingBehavior extends Behavior implements IPathingBehavior,
     @Override
     public void onPlayerUpdate(PlayerUpdateEvent event) {
         if (current != null) {
-            switch (event.getState()) {
-                case PRE:
-                    lastAutoJump = mc.options.autoJump;
-                    mc.options.autoJump = false;
-                    break;
-                case POST:
-                    mc.options.autoJump = lastAutoJump;
-                    break;
-                default:
-                    break;
-            }
+            // BaritoneSpigot - uh we'll have to handle this separately
+//            switch (event.getState()) {
+//                case PRE:
+//                    lastAutoJump = mc.options.autoJump;
+//                    mc.options.autoJump = false;
+//                    break;
+//                case POST:
+//                    mc.options.autoJump = lastAutoJump;
+//                    break;
+//                default:
+//                    break;
+//            }
         }
     }
 
@@ -560,8 +561,4 @@ public final class PathingBehavior extends Behavior implements IPathingBehavior,
         return new AStarPathFinder(start.getX(), start.getY(), start.getZ(), transformed, favoring, context);
     }
 
-    @Override
-    public void onRenderPass(RenderEvent event) {
-        PathRenderer.render(event, this);
-    }
 }

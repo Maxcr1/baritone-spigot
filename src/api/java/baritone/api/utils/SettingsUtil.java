@@ -19,7 +19,6 @@ package baritone.api.utils;
 
 import baritone.api.BaritoneAPI;
 import baritone.api.Settings;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
 import net.minecraft.core.Vec3i;
@@ -47,10 +46,13 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static baritone.api.utils.Helper.mc;
+
 
 public class SettingsUtil {
 
-    private static final Path SETTINGS_PATH = Minecraft.getInstance().gameDirectory.toPath().resolve("baritone").resolve("settings.txt");
+    private static final Path SETTINGS_PATH = mc.plugin.getDataFolder().getParentFile().getParentFile().
+            getAbsoluteFile().toPath().resolve("baritone").resolve("settings.txt");
     private static final Pattern SETTING_PATTERN = Pattern.compile("^(?<setting>[^ ]+) +(?<value>.+)"); // key and value split by the first space
     private static final String[] JAVA_ONLY_SETTINGS = {"logger", "notifier", "toaster"};
 

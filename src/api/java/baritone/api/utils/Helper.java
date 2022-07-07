@@ -18,7 +18,7 @@
 package baritone.api.utils;
 
 import baritone.api.BaritoneAPI;
-import baritone.api.Minecraft;
+import baritone.api.Spigot;
 import net.minecraft.ChatFormatting;
 
 import java.util.stream.Stream;
@@ -40,7 +40,7 @@ public interface Helper {
     /**
      * Instance of the game
      */
-    Minecraft mc = Minecraft.getInstance();
+    Spigot mc = Spigot.getInstance();
 
 //    static Component getPrefix() {
 //        // Inner text component

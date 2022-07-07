@@ -51,17 +51,17 @@ import java.util.concurrent.TimeUnit;
 public class Baritone implements IBaritone {
 
     private static ThreadPoolExecutor threadPool;
-    private static File dir;
+//    private static File dir;
 
     static {
         threadPool = new ThreadPoolExecutor(4, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<>());
 
-        dir = new File(Minecraft.getInstance().gameDirectory, "baritone");
-        if (!Files.exists(dir.toPath())) {
-            try {
-                Files.createDirectories(dir.toPath());
-            } catch (IOException ignored) {}
-        }
+//        dir = new File(Minecraft.getInstance().gameDirectory, "baritone");
+//        if (!Files.exists(dir.toPath())) {
+//            try {
+//                Files.createDirectories(dir.toPath());
+//            } catch (IOException ignored) {}
+//        }
     }
 
     private GameEventHandler gameEventHandler;
@@ -212,7 +212,7 @@ public class Baritone implements IBaritone {
     }
 
     public static File getDir() {
-        return dir;
+        return null;
     }
 
     public static Executor getExecutor() {

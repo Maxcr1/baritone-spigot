@@ -27,7 +27,8 @@ import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.packs.repository.ServerPacksSource;
-import net.minecraft.server.packs.resources.ReloadableResourceManager;
+import net.minecraft.server.packs.resources.FallbackResourceManager;
+import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.Unit;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -141,23 +142,6 @@ public final class BlockOptionalMeta {
         return null;
     }
 
-    public static LootTables getManager() {
-        if (manager == null) {
-            PackRepository rpl = new PackRepository(PackType.SERVER_DATA, new ServerPacksSource());
-            rpl.reload();
-            PackResources thePack = rpl.getAvailablePacks().iterator().next().open();
-            ReloadableResourceManager resourceManager = new ReloadableResourceManager(PackType.SERVER_DATA);
-            manager = new LootTables(predicate);
-            resourceManager.registerReloadListener(manager);
-            try {
-                resourceManager.createReload(new ThreadPerTaskExecutor(Thread::new), new ThreadPerTaskExecutor(Thread::new), CompletableFuture.completedFuture(Unit.INSTANCE), Collections.singletonList(thePack)).done().get();
-            } catch (Exception exception) {
-                throw new RuntimeException(exception);
-            }
-        }
-        return manager;
-    }
-
     public static PredicateManager getPredicateManager() {
         return predicate;
     }
@@ -168,20 +152,7 @@ public final class BlockOptionalMeta {
             if (lootTableLocation == BuiltInLootTables.EMPTY) {
                 return Collections.emptyList();
             } else {
-                List<Item> items = new ArrayList<>();
-
-                // the other overload for generate doesnt work in forge because forge adds code that requires a non null world
-                getManager().get(lootTableLocation).getRandomItems(
-                        new LootContext.Builder((ServerLevel) null)
-                                .withRandom(new Random())
-                                .withParameter(LootContextParams.ORIGIN, Vec3.atLowerCornerOf(BlockPos.ZERO))
-                                .withParameter(LootContextParams.TOOL, ItemStack.EMPTY)
-                                .withOptionalParameter(LootContextParams.BLOCK_ENTITY, null)
-                                .withParameter(LootContextParams.BLOCK_STATE, block.defaultBlockState())
-                                .create(LootContextParamSets.BLOCK),
-                        stack -> items.add(stack.getItem())
-                );
-                return items;
+                return new ArrayList<>();
             }
         });
     }

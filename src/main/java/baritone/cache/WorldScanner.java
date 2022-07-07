@@ -22,8 +22,8 @@ import baritone.api.cache.IWorldScanner;
 import baritone.api.utils.BetterBlockPos;
 import baritone.api.utils.BlockOptionalMetaLookup;
 import baritone.api.utils.IPlayerContext;
-import net.minecraft.client.multiplayer.ClientChunkCache;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkSource;
@@ -45,7 +45,7 @@ public enum WorldScanner implements IWorldScanner {
         if (filter.blocks().isEmpty()) {
             return res;
         }
-        ClientChunkCache chunkProvider = (ClientChunkCache) ctx.world().getChunkSource();
+        ServerChunkCache chunkProvider = ctx.world().getChunkSource();
 
         int maxSearchRadiusSq = maxSearchRadius * maxSearchRadius;
         int playerChunkX = ctx.playerFeet().getX() >> 4;
@@ -69,7 +69,7 @@ public enum WorldScanner implements IWorldScanner {
                     foundChunks = true;
                     int chunkX = xoff + playerChunkX;
                     int chunkZ = zoff + playerChunkZ;
-                    LevelChunk chunk = chunkProvider.getChunk(chunkX, chunkZ, null, false);
+                    LevelChunk chunk = (LevelChunk) chunkProvider.getChunk(chunkX, chunkZ, null, false);
                     if (chunk == null) {
                         continue;
                     }
@@ -95,8 +95,8 @@ public enum WorldScanner implements IWorldScanner {
             return Collections.emptyList();
         }
 
-        ClientChunkCache chunkProvider = (ClientChunkCache) ctx.world().getChunkSource();
-        LevelChunk chunk = chunkProvider.getChunk(pos.x, pos.z, null, false);
+        ServerChunkCache chunkProvider = ctx.world().getChunkSource();
+        LevelChunk chunk = (LevelChunk) chunkProvider.getChunk(pos.x, pos.z, null, false);
         int playerY = ctx.playerFeet().getY();
 
         if (chunk == null || chunk.isEmpty()) {

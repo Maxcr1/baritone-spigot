@@ -18,7 +18,6 @@
 package baritone.api.event.listener;
 
 import baritone.api.event.events.*;
-import net.minecraft.client.gui.screens.DeathScreen;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -65,13 +64,6 @@ public interface IGameEventListener {
      * @param event The event
      */
     void onChunkEvent(ChunkEvent event);
-
-    /**
-     * Runs once per world render pass.
-     *
-     * @param event The event
-     */
-    void onRenderPass(RenderEvent event);
 
     /**
      * Runs before and after whenever a new world is loaded
@@ -121,9 +113,8 @@ public interface IGameEventListener {
     void onBlockInteract(BlockInteractEvent event);
 
     /**
-     * Called when the local player dies, as indicated by the creation of the {@link DeathScreen} screen.
+     * Called when the local player dies, as indicated by the creation of the {@link} screen.
      *
-     * @see DeathScreen
      */
     void onPlayerDeath();
 

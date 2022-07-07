@@ -17,14 +17,12 @@
 
 package baritone.utils;
 
-import baritone.Baritone;
+import baritone.api.Spigot;
 import baritone.api.utils.IPlayerContext;
 import baritone.cache.CachedRegion;
 import baritone.cache.WorldData;
-import baritone.utils.accessor.IClientChunkProvider;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientChunkCache;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -41,7 +39,7 @@ import net.minecraft.world.level.chunk.LevelChunkSection;
  */
 public class BlockStateInterface {
 
-    private final ClientChunkCache provider;
+    private final ServerChunkCache provider;
     private final WorldData worldData;
     protected final BlockGetter world;
     public final BlockPos.MutableBlockPos isPassableBlockPos;
@@ -49,8 +47,6 @@ public class BlockStateInterface {
 
     private LevelChunk prev = null;
     private CachedRegion prevCached = null;
-
-    private final boolean useTheRealWorld;
 
     private static final BlockState AIR = Blocks.AIR.defaultBlockState();
 
@@ -66,12 +62,11 @@ public class BlockStateInterface {
         this.world = world;
         this.worldData = worldData;
         if (copyLoadedChunks) {
-            this.provider = ((IClientChunkProvider) world.getChunkSource()).createThreadSafeCopy();
+            this.provider = (ServerChunkCache) world.getChunkSource();
         } else {
-            this.provider = (ClientChunkCache) world.getChunkSource();
+            this.provider = (ServerChunkCache) world.getChunkSource();
         }
-        this.useTheRealWorld = !Baritone.settings().pathThroughCachedOnly.value;
-        if (!Minecraft.getInstance().isSameThread()) {
+        if (!Spigot.getInstance().isSameThread()) {
             throw new IllegalStateException();
         }
         this.isPassableBlockPos = new BlockPos.MutableBlockPos();
@@ -103,23 +98,22 @@ public class BlockStateInterface {
             return AIR;
         }
 
-        if (useTheRealWorld) {
-            LevelChunk cached = prev;
-            // there's great cache locality in block state lookups
-            // generally it's within each movement
-            // if it's the same chunk as last time
-            // we can just skip the mc.world.getChunk lookup
-            // which is a Long2ObjectOpenHashMap.get
-            // see issue #113
-            if (cached != null && cached.getPos().x == x >> 4 && cached.getPos().z == z >> 4) {
-                return getFromChunk(cached, x, y, z);
-            }
-            LevelChunk chunk = provider.getChunk(x >> 4, z >> 4, ChunkStatus.FULL, false);
-            if (chunk != null && !chunk.isEmpty()) {
-                prev = chunk;
-                return getFromChunk(chunk, x, y, z);
-            }
+        LevelChunk cachedC = prev;
+        // there's great cache locality in block state lookups
+        // generally it's within each movement
+        // if it's the same chunk as last time
+        // we can just skip the mc.world.getChunk lookup
+        // which is a Long2ObjectOpenHashMap.get
+        // see issue #113
+        if (cachedC != null && cachedC.getPos().x == x >> 4 && cachedC.getPos().z == z >> 4) {
+            return getFromChunk(cachedC, x, y, z);
         }
+        LevelChunk chunk = (LevelChunk) provider.getChunk(x >> 4, z >> 4, ChunkStatus.FULL, false);
+        if (chunk != null && !chunk.isEmpty()) {
+            prev = chunk;
+            return getFromChunk(chunk, x, y, z);
+        }
+
         // same idea here, skip the Long2ObjectOpenHashMap.get if at all possible
         // except here, it's 512x512 tiles instead of 16x16, so even better repetition
         CachedRegion cached = prevCached;
@@ -146,7 +140,7 @@ public class BlockStateInterface {
         if (prevChunk != null && prevChunk.getPos().x == x >> 4 && prevChunk.getPos().z == z >> 4) {
             return true;
         }
-        prevChunk = provider.getChunk(x >> 4, z >> 4, ChunkStatus.FULL, false);
+        prevChunk = (LevelChunk) provider.getChunk(x >> 4, z >> 4, ChunkStatus.FULL, false);
         if (prevChunk != null && !prevChunk.isEmpty()) {
             prev = prevChunk;
             return true;

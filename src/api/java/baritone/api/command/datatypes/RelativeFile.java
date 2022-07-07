@@ -94,7 +94,8 @@ public enum RelativeFile implements IDatatypePost<File, File> {
     }
 
     public static File gameDir() {
-        File gameDir = HELPER.mc.gameDirectory.getAbsoluteFile();
+        // BaritoneSpigot: server/plugin/ThisPlugin
+        File gameDir = HELPER.mc.plugin.getDataFolder().getParentFile().getParentFile().getAbsoluteFile();
         if (gameDir.getName().equals(".")) {
             return gameDir.getParentFile();
         }

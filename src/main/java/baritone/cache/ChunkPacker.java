@@ -167,9 +167,9 @@ public final class ChunkPacker {
                 if (dimension.ultraWarm()) {
                     return Blocks.NETHERRACK.defaultBlockState();
                 }
-                if (dimension.createDragonFight()) {
-                    return Blocks.END_STONE.defaultBlockState();
-                }
+//                if (dimension.createDragonFight()) {
+//                    return Blocks.END_STONE.defaultBlockState();
+//                }
             default:
                 return null;
         }
